@@ -54,7 +54,7 @@ namespace UnityCSharp11
 
                         string packagePath = FileUtil.GetPhysicalPath("Packages/com.alexejhero.unitycsharp11");
                         if (packagePath == "Packages/com.alexejhero.unitycsharp11") packagePath = FileUtil.GetPhysicalPath("Assets");
-                        string exePath = Path.Combine(packagePath, "UnityCSharp11", "UnityPatcher~", "UnityPatcher.exe");
+                        string exePath = Path.Combine(packagePath, "UnityPatcher~", "UnityPatcher.exe");
 
                         Process.Start(new ProcessStartInfo
                         {
@@ -79,7 +79,7 @@ namespace UnityCSharp11
 
                         string packagePath = FileUtil.GetPhysicalPath("Packages/com.alexejhero.unitycsharp11");
                         if (packagePath == "Packages/com.alexejhero.unitycsharp11") packagePath = FileUtil.GetPhysicalPath("Assets");
-                        string exePath = Path.Combine(packagePath, "UnityCSharp11", "UnityPatcher~", "UnityPatcher.exe");
+                        string exePath = Path.Combine(packagePath, "UnityPatcher~", "UnityPatcher.exe");
 
                         Process.Start(new ProcessStartInfo
                         {
