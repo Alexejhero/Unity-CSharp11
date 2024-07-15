@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "displayName": "Unity C# 11",
   "author": "Alexejhero",
-  "description": "Adds support for C# 11 in Unity",
+  "description": "Changes the C# language version to C# 11 in Unity and adds support for MonoBehaviours and ScriptableObjects in files with file-scoped namespaces.",
   "unity": "2022.1",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.nuget.mono-cecil": "1.11.4"
+  }
 }

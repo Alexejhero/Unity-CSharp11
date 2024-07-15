@@ -14,8 +14,6 @@ namespace UnityCSharp11.Csproj
 
         public override void PostProcess(XDocument doc, string path)
         {
-            if (!Configuration.IsEnabled) return;
-
             XElement langVer = doc.Root!
                 .Elements("PropertyGroup")
                 .Select(group => group.Element("LangVersion"))

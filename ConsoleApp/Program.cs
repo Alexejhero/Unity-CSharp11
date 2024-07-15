@@ -9,13 +9,24 @@ namespace UnityPatcher
 {
     internal static class Program
     {
-        private static string EditorFolderForRelaunch { get; set; }
+        private static string _editorPath;
+        private static string _assetsPath;
+
+        private static bool _stillSilent = true;
+
+        private static bool _elevated;
 
         public static void Main(string[] args)
         {
+            string unityPath = null;
+            string projectPath = null;
+
+            if (args.Contains("-ns")) _stillSilent = false;
+            if (args.Contains("-e")) _elevated = true;
+
             try
             {
-                Execute(args);
+                Execute(args, out unityPath, out projectPath);
             }
             catch (Exception e)
             {
@@ -24,13 +35,38 @@ namespace UnityPatcher
                 Console.WriteLine(e.ToString());
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            bool canRelaunch = unityPath != null && projectPath != null;
+
+            if (_elevated && canRelaunch)
+            {
+                _stillSilent = false;
+                Console.WriteLine();
+                Console.WriteLine("Unity will now be relaunched.");
+                Console.WriteLine("You might get a warning about launching Unity as administrator.");
+                Console.WriteLine("If that happens, click 'Restart as standard user'.");
+            }
+
+            if (!_stillSilent)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+            }
+
+            if (unityPath != null && projectPath != null)
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = unityPath,
+                    Arguments = $"-projectPath \"{projectPath}\""
+                });
+            }
         }
 
-        private static void Execute(string[] args)
+        private static void Execute(string[] args, out string unityPath, out string projectPath)
         {
+            unityPath = projectPath = null;
+
             Console.WriteLine("Unity 2022+ File Scoped Namespaces Patcher");
             Console.WriteLine("by Alexejhero");
             Console.WriteLine();
@@ -43,6 +79,8 @@ namespace UnityPatcher
 
             if (!TryGetIntention(args, patched, out bool intentionToPatch)) return;
 
+            GetUnityLaunchPath(args, out unityPath, out projectPath);
+
             if (!intentionToPatch) DoUnpatch(dllPath, asm);
             else DoPatch(dllPath, asm);
         }
@@ -52,6 +90,7 @@ namespace UnityPatcher
             string editorFolder;
             if (args.Length < 1)
             {
+                _stillSilent = false;
                 Console.WriteLine("Please enter the path to the Editor\\Data folder of the Unity version that you want to patch/unpatch.");
                 Console.WriteLine("This is the same as EditorApplication.applicationContentsPath in Unity.");
                 Console.WriteLine("Example: C:\\Program Files\\Unity\\Hub\\Editor\\2022.3.37f1\\Editor\\Data");
@@ -66,7 +105,21 @@ namespace UnityPatcher
             }
 
             dllPath = PathCombine(editorFolder, "Tools", "Unity.SourceGenerators", "Unity.SourceGenerators.dll");
-            EditorFolderForRelaunch = editorFolder;
+            _editorPath = editorFolder;
+        }
+
+        private static void GetUnityLaunchPath(string[] args, out string unityPath, out string projectPath)
+        {
+            if (args.Length < 3)
+            {
+                unityPath = null;
+                projectPath = null;
+            }
+
+            unityPath = PathCombine(args[0], "..", "Unity.exe");
+            projectPath = PathCombine(args[2], "..");
+
+            _assetsPath = args[2];
         }
 
         private static bool CheckDllPath(string dllPath, bool initial)
@@ -74,6 +127,7 @@ namespace UnityPatcher
             Console.WriteLine("Checking path...");
             if (!File.Exists(dllPath))
             {
+                _stillSilent = false;
                 Console.WriteLine("ERROR!");
                 Console.WriteLine($"Unity.SourceGenerators.dll not found at path {dllPath}");
                 if (initial)
@@ -100,6 +154,8 @@ namespace UnityPatcher
                 intentionToPatch = false;
                 return true;
             }
+
+            _stillSilent = false;
 
             if (isAlreadyPatched)
             {
@@ -142,6 +198,7 @@ namespace UnityPatcher
 
             if (!File.Exists(backupPath))
             {
+                _stillSilent = false;
                 Console.WriteLine($"Missing backup file at path {backupPath}");
                 Console.WriteLine("Unpatching not possible");
                 Console.WriteLine("If you want to unpatch, please redownload Unity");
@@ -157,6 +214,8 @@ namespace UnityPatcher
             }
             catch (Exception e)
             {
+                _stillSilent = false;
+                Console.WriteLine();
                 Console.WriteLine("Unpatch failed due to exception:");
                 Console.WriteLine(e.ToString());
                 Console.WriteLine();
@@ -175,7 +234,7 @@ namespace UnityPatcher
                 Console.WriteLine();
                 Console.WriteLine();
                 if (key.Key == ConsoleKey.D1) DoUnpatch(dllPath, null);
-                else if (key.Key == ConsoleKey.D2) RelaunchAsAdmin($@"""{EditorFolderForRelaunch}"" -u");
+                else if (key.Key == ConsoleKey.D2) RelaunchAsAdmin($@"""{_editorPath}"" -u ""{_assetsPath}"" -e {(!_stillSilent ? " -ns" : "")}");
                 else if (key.Key == ConsoleKey.D3) DoManualUnpatch(dllPath);
             }
         }
@@ -190,7 +249,7 @@ namespace UnityPatcher
             Console.WriteLine("After this is done, press any key to verify if the unpatch was successful.");
             Console.WriteLine();
 
-            Process.Start("explorer.exe", "/select,\"" + dllPath + "\"");
+            Process.Start("explorer.exe", $"/select,\"{Path.GetFullPath(dllPath)}\"");
             Console.ReadKey();
 
             if (!CheckDllPath(dllPath, false))
@@ -288,6 +347,7 @@ namespace UnityPatcher
 
             if (changes <= 0)
             {
+                _stillSilent = false;
                 Console.WriteLine();
                 Console.WriteLine("No changes made. Assembly seems to be already patched somehow, even though previous patch checks failed.");
                 Console.WriteLine("This should never happen...");
@@ -326,6 +386,8 @@ namespace UnityPatcher
             }
             catch (Exception e)
             {
+                _stillSilent = false;
+                Console.WriteLine();
                 Console.WriteLine("Patch failed due to exception:");
                 Console.WriteLine(e.ToString());
                 Console.WriteLine();
@@ -344,7 +406,7 @@ namespace UnityPatcher
                 Console.WriteLine();
                 Console.WriteLine();
                 if (key.Key == ConsoleKey.D1) DoPatchSave(tempDll, tempBck, targetDll, targetBck);
-                else if (key.Key == ConsoleKey.D2) RelaunchAsAdmin($@"""{EditorFolderForRelaunch}"" -p");
+                else if (key.Key == ConsoleKey.D2) RelaunchAsAdmin($@"""{_editorPath}"" -p ""{_assetsPath}"" -e {(!_stillSilent ? " -ns" : "")}");
                 else if (key.Key == ConsoleKey.D3) DoManualPatchSave(tempDll, targetDll);
             }
         }
@@ -353,12 +415,13 @@ namespace UnityPatcher
         {
             Console.WriteLine("Two directories have been opened in your file explorer application.");
             Console.WriteLine("Please move the Unity.SourceGenerators.dll and Unity.SourceGenerators.dll.bck file from the temporary directory to the Unity.SourceGenerators directory, overriding any existing files.");
+            Console.WriteLine("Important! If you don't move the .bck file as well, you will not be able to unpatch Unity after.");
             Console.WriteLine();
             Console.WriteLine("After this is done, press any key to verify if the patch was successful.");
             Console.WriteLine();
 
-            Process.Start("explorer.exe", "/select,\"" + tempDll + "\"");
-            Process.Start("explorer.exe", "/select,\"" + targetDll + "\"");
+            Process.Start("explorer.exe", $"/select,\"{Path.GetFullPath(tempDll)}\"");
+            Process.Start("explorer.exe", $"/select,\"{Path.GetFullPath(targetDll)}\"");
             Console.ReadKey();
 
             if (!CheckDllPath(targetDll, false))
