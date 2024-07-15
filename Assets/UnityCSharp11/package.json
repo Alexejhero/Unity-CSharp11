@@ -1,0 +1,9 @@
+﻿{
+  "name": "com.alexejhero.unitycsharp11",
+  "version": "1.0.0",
+  "displayName": "Unity C# 11",
+  "author": "Alexejhero",
+  "description": "Adds support for C# 11 in Unity",
+  "unity": "2022.1",
+  "license": "MIT"
+}

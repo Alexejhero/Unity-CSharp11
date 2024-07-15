@@ -1,0 +1,9 @@
+﻿{
+  "name": "com.alexejhero.unitycsharp11.hotreload",
+  "version": "1.0.0",
+  "displayName": "Unity C# 11 - Hot Reload Integration",
+  "author": "Alexejhero",
+  "description": "Add-on for Unity C# 11 that adds support for Hot Reload",
+  "unity": "2022.1",
+  "license": "MIT"
+}

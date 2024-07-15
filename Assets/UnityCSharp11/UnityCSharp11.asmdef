@@ -1,0 +1,18 @@
+{
+    "name": "UnityCSharp11",
+    "rootNamespace": "",
+    "references": [
+        "GUID:43aab4a50a5839e44af6c24ac5006688"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
