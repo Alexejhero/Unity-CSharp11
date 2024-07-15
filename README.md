@@ -1,5 +1,8 @@
 ## Unity C#11
 Unity package based on [Unity Roslyn Updater](https://github.com/DaZombieKiller/UnityRoslynUpdater) to enable using C#11 features in Unity 2022.
+
+Designed only to work on Windows.
+
 #### Installation and Use
 Install from this git URL: `https://github.com/Alexejhero/Unity-CSharp11.git?path=Assets/UnityCSharp11` (see [How to install from a git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html))
 
