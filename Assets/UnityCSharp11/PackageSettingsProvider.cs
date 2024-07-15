@@ -53,7 +53,8 @@ namespace UnityCSharp11
                         EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
                         string packagePath = FileUtil.GetPhysicalPath("Packages/com.alexejhero.unitycsharp11");
-                        if (packagePath == "Packages/com.alexejhero.unitycsharp11") packagePath = FileUtil.GetPhysicalPath("Assets");
+                        // adjust path for local development
+                        if (packagePath == "Packages/com.alexejhero.unitycsharp11") packagePath = FileUtil.GetPhysicalPath("Assets/UnityCSharp11");
                         string exePath = Path.Combine(packagePath, "UnityPatcher~", "UnityPatcher.exe");
 
                         Process.Start(new ProcessStartInfo
@@ -78,7 +79,8 @@ namespace UnityCSharp11
                         EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
                         string packagePath = FileUtil.GetPhysicalPath("Packages/com.alexejhero.unitycsharp11");
-                        if (packagePath == "Packages/com.alexejhero.unitycsharp11") packagePath = FileUtil.GetPhysicalPath("Assets");
+                        // adjust path for local development
+                        if (packagePath == "Packages/com.alexejhero.unitycsharp11") packagePath = FileUtil.GetPhysicalPath("Assets/UnityCSharp11");
                         string exePath = Path.Combine(packagePath, "UnityPatcher~", "UnityPatcher.exe");
 
                         Process.Start(new ProcessStartInfo
