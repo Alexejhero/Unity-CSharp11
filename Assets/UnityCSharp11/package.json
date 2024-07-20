@@ -1,6 +1,6 @@
 ﻿{
   "name": "com.alexejhero.unitycsharp11",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Unity C# 11",
   "author": "Alexejhero",
   "description": "Changes the C# language version to C# 11 in Unity and adds support for MonoBehaviours and ScriptableObjects in files with file-scoped namespaces.",
