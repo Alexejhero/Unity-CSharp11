@@ -1,0 +1,27 @@
+.unity-text-element {
+    font-size: 13px;
+}
+
+.unity-label {
+    white-space: normal;
+}
+
+.unity-button {
+    max-width: 100px;
+}
+
+.unpatched #patched {
+    display: none;
+}
+
+.patched #patched {
+    display: flex;
+}
+
+.unpatched #unpatched {
+    display: flex;
+}
+
+.patched #unpatched {
+    display: none;
+}

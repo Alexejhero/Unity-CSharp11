@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UnityCSharp11/Settings/style.uss?fileID=7433441132597879392&amp;guid=78a82cd0e73144d4c99994a195579009&amp;type=3#style" />
+    <ui:VisualElement style="width: auto; margin-top: 1%; margin-right: 1%; margin-bottom: 1%; margin-left: 1%;">
+        <ui:Label tabindex="-1" text="File-scoped Namespaces" parse-escape-sequences="true" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
+        <ui:Label tabindex="-1" text="Unity does not natively support MonoBehaviours or ScriptableObjects in files with file-scoped namespaces, and will refuse to load them. In order to use this feature in Unity, an editor patch is required." parse-escape-sequences="true" display-tooltip-when-elided="true" style="white-space: normal;" />
+        <ui:VisualElement name="spacer" style="flex-grow: 1; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;" />
+        <ui:VisualElement name="patched" style="flex-grow: 1;">
+            <ui:VisualElement name="status" style="flex-grow: 1; justify-content: flex-start; align-self: auto; align-items: stretch;">
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="status-label" text="Unity {0} is currently patched." style="color: rgb(0, 255, 0);" />
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="status-desc" text="You now have access to use file-scoped namespaces in MonoBehaviour and ScriptableObject files." style="margin-bottom: 12px;" />
+            </ui:VisualElement>
+            <ui:Label tabindex="-1" text="This patch does not affect the runtime in any way, and it also doesn&apos;t break other projects which don&apos;t use this package. As such, once you apply it, there is no real need to ever remove it. However, if you want to, you can still do so." parse-escape-sequences="true" display-tooltip-when-elided="true" name="unpatch-remark" />
+            <ui:Button text="Unpatch" parse-escape-sequences="true" display-tooltip-when-elided="true" name="unpatch" style="width: auto; align-items: flex-start; justify-content: flex-start; align-self: auto;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="unpatched" style="flex-grow: 1;">
+            <ui:VisualElement name="status" style="flex-grow: 1;">
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="status-label" text="Unity {0} is currently not patched." style="color: rgb(255, 0, 0);" />
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="status-desc" text="If this project uses file-scoped namespaces in MonoBehaviour or ScriptableObject files, they will not be recognised by Unity. To fix this, apply the patch." style="margin-bottom: 12px;" />
+            </ui:VisualElement>
+            <ui:Button text="Patch" parse-escape-sequences="true" display-tooltip-when-elided="true" name="patch" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
