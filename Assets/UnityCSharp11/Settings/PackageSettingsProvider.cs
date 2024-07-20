@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using UnityCSharp11.Settings.Dialogs;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,11 +10,9 @@ namespace UnityCSharp11.Settings
 {
     public sealed class PackageSettingsProvider : SettingsProvider
     {
-        private const string DocPath = "Settings/Settings.uxml";
         private readonly TemplateContainer _root;
+        internal static PackageSettingsProvider Instance;
 
-        private bool _patched;
-        
         private static string PackagePath
         {
             get
@@ -28,8 +27,9 @@ namespace UnityCSharp11.Settings
 
         private PackageSettingsProvider() : base("Preferences/C# 11", SettingsScope.User)
         {
-            string assetPath = Path.Join(PackagePath, DocPath).Replace('\\', '/');
-            VisualTreeAsset doc = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+            Instance = this;
+            string uxmlPath = AssetDatabase.GUIDToAssetPath("bee79e4550d59f44a980f4620ac749e1");
+            VisualTreeAsset doc = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxmlPath);
             _root = doc.Instantiate();
         }
 
@@ -38,18 +38,28 @@ namespace UnityCSharp11.Settings
             rootElement.Add(_root);
             _root.Q<Button>("patch").clicked += () => ConfirmAndPatch(true);
             _root.Q<Button>("unpatch").clicked += () => ConfirmAndPatch(false);
+            _root.Q<Toggle>("suppress-unpatched-dialog").value = !PatchDialog.ShowPatchDialog;
+            _root.Q<Toggle>("suppress-unpatched-dialog").RegisterCallback<ChangeEvent<bool>>(evt =>
+            {
+                PatchDialog.ShowPatchDialog = !evt.newValue;
+            });
             UpdatePatched();
         }
 
         private void UpdatePatched()
         {
-            _patched = PatchChecker.IsPatched();
-            string status = _patched ? "patched" : "unpatched";
+            var isPatched = PatchChecker.IsPatched();
+            string status = isPatched ? "patched" : "unpatched";
             _root.ClearClassList();
             _root.AddToClassList(status); 
             
-            string statusText = $"Unity {Application.unityVersion} is currently {(_patched ? "patched" : "not patched")}.";
+            string statusText = $"Unity {Application.unityVersion} is currently {(isPatched ? "patched" : "not patched")}.";
             _root.Q(status).Q<Label>("status-label").text = statusText;
+        }
+
+        public void OnShowPatchDialogUpdated()
+        {
+            _root.Q<Toggle>("suppress-unpatched-dialog").value = !PatchDialog.ShowPatchDialog;
         }
 
         [SettingsProvider]
@@ -61,7 +71,7 @@ namespace UnityCSharp11.Settings
             };
         }
 
-        private void ConfirmAndPatch(bool patch)
+        internal static void ConfirmAndPatch(bool patch)
         {
             bool confirmed = EditorUtility.DisplayDialog(
                 patch ? "Patch Unity?" : "Unpatch Unity?",

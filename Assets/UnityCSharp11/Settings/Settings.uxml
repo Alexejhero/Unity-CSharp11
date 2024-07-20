@@ -4,6 +4,10 @@
         <ui:Label tabindex="-1" text="File-scoped Namespaces" parse-escape-sequences="true" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
         <ui:Label tabindex="-1" text="Unity does not natively support MonoBehaviours or ScriptableObjects in files with file-scoped namespaces, and will refuse to load them. In order to use this feature in Unity, an editor patch is required." parse-escape-sequences="true" display-tooltip-when-elided="true" style="white-space: normal;" />
         <ui:VisualElement name="spacer" style="flex-grow: 1; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;" />
+        <ui:VisualElement name="dialog-checkbox-container" style="flex-grow: 1;">
+            <ui:Toggle label="Don't remind to patch" name="suppress-unpatched-dialog" value="true" tooltip="If unchecked, shows a dialog on startup if the editor is not patched." />
+        </ui:VisualElement>
+        <ui:VisualElement name="spacer" style="flex-grow: 1; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;" />
         <ui:VisualElement name="patched" style="flex-grow: 1;">
             <ui:VisualElement name="status" style="flex-grow: 1; justify-content: flex-start; align-self: auto; align-items: stretch;">
                 <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="status-label" text="Unity {0} is currently patched." style="color: rgb(0, 255, 0);" />
