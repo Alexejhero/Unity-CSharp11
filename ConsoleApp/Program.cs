@@ -30,26 +30,26 @@ namespace UnityPatcher
             }
             catch (Exception e)
             {
-                Console.WriteLine();
-                Console.WriteLine("Program interrupted due to exception");
-                Console.WriteLine(e.ToString());
+                Logger.Error.WriteLines("",
+                    "Program interrupted due to exception",
+                    e.ToString());
             }
 
-            bool canRelaunch = unityPath != null && projectPath != null;
+            bool canRelaunch = !string.IsNullOrEmpty(unityPath) && !string.IsNullOrEmpty(projectPath);
 
             if (_elevated && canRelaunch)
             {
                 _stillSilent = false;
-                Console.WriteLine();
-                Console.WriteLine("Unity will now be relaunched.");
-                Console.WriteLine("You might get a warning about launching Unity as administrator.");
-                Console.WriteLine("If that happens, click 'Restart as standard user'.");
+                Logger.Warning.WriteLines("",
+                    "Unity will now be relaunched.",
+                    "You might get a warning about launching Unity as administrator.",
+                    "If that happens, click 'Restart as standard user'.");
             }
 
             if (!_stillSilent)
             {
-                Console.WriteLine();
-                Console.WriteLine("Press any key to exit...");
+                Logger.Info.WriteLines("",
+                    "Press any key to exit...");
                 Console.ReadKey();
             }
 
@@ -67,14 +67,15 @@ namespace UnityPatcher
         {
             unityPath = projectPath = null;
 
-            Console.WriteLine("Unity 2022+ File Scoped Namespaces Patcher");
-            Console.WriteLine("by Alexejhero");
-            Console.WriteLine();
+            Logger.Message.WriteLines(
+                "Unity 2022+ File Scoped Namespaces Patcher",
+                "by Alexejhero",
+                "");
 
             GetDllPath(args, out string dllPath);
             if (!CheckDllPath(dllPath, true)) return;
 
-            Console.WriteLine("Checking patch status...");
+            Logger.Debug.WriteLines("Checking patch status...");
             bool patched = CheckPatch(dllPath, out AssemblyDefinition asm);
 
             if (!TryGetIntention(args, patched, out bool intentionToPatch)) return;
@@ -91,13 +92,14 @@ namespace UnityPatcher
             if (args.Length < 1)
             {
                 _stillSilent = false;
-                Console.WriteLine("Please enter the path to the Editor\\Data folder of the Unity version that you want to patch/unpatch.");
-                Console.WriteLine("This is the same as EditorApplication.applicationContentsPath in Unity.");
-                Console.WriteLine("Example: C:\\Program Files\\Unity\\Hub\\Editor\\2022.3.37f1\\Editor\\Data");
-                Console.WriteLine();
-                Console.Write("> ");
+                Logger.Info.WriteLines(
+                    "Please enter the path to the Editor\\Data folder of the Unity version that you want to patch/unpatch.",
+                    "This is the same as EditorApplication.applicationContentsPath in Unity.",
+                    @"Example: C:\Program Files\Unity\Hub\Editor\2022.3.37f1\Editor\Data",
+                    "");
+                Logger.Info.Write("> ");
                 editorFolder = Console.ReadLine();
-                Console.WriteLine();
+                Logger.Info.WriteLines("");
             }
             else
             {
@@ -110,10 +112,11 @@ namespace UnityPatcher
 
         private static void GetUnityLaunchPath(string[] args, out string unityPath, out string projectPath)
         {
-            if (args.Length < 3)
+            if (args.Length < 3 || string.IsNullOrEmpty(args[0]) || string.IsNullOrEmpty(args[2]))
             {
                 unityPath = null;
                 projectPath = null;
+                return;
             }
 
             unityPath = PathCombine(args[0], "..", "Unity.exe");
@@ -124,16 +127,18 @@ namespace UnityPatcher
 
         private static bool CheckDllPath(string dllPath, bool initial)
         {
-            Console.WriteLine("Checking path...");
+            Logger.Debug.WriteLines("Checking path...");
             if (!File.Exists(dllPath))
             {
                 _stillSilent = false;
-                Console.WriteLine("ERROR!");
-                Console.WriteLine($"Unity.SourceGenerators.dll not found at path {dllPath}");
+                Logger.Error.WriteLines(
+                    "ERROR!",
+                    $"Unity.SourceGenerators.dll not found at path {dllPath}");
                 if (initial)
                 {
-                    Console.WriteLine("This could mean that you have entered an incorrect path, or that the Unity version you are trying to patch does not have this file.");
-                    Console.WriteLine("Keep in mind Unity versions before 2022 (2021 and below) are not supported.");
+                    Logger.Warning.WriteLines(
+                        "This could mean that you have entered an incorrect path, or that the Unity version you are trying to patch does not have this file.",
+                        "Keep in mind Unity versions before 2022 (2021 and below) are not supported.");
                 }
                 return false;
             }
@@ -161,25 +166,26 @@ namespace UnityPatcher
             {
                 intentionToPatch = false;
 
-                Console.WriteLine();
-                Console.WriteLine("Unity seems to already be patched.");
-                Console.WriteLine("There is no reason to unpatch it, as it will not cause any problems or conflict with other projects.");
-                Console.WriteLine("However, if you still want to unpatch, you can do so.");
-                Console.WriteLine();
+                Logger.Info.WriteLines(
+                    "",
+                    "Unity seems to already be patched.",
+                    "There is no reason to unpatch it, as it will not cause any problems or conflict with other projects.",
+                    "However, if you still want to unpatch, you can do so.",
+                    "");
 
-                Console.Write("Do you want to unpatch? (y/N) ");
+                Logger.Info.Write("Do you want to unpatch? (y/N) ");
                 return YesNoChoice(false);
             }
             else
             {
                 intentionToPatch = true;
 
-                Console.WriteLine();
-                Console.WriteLine("Unity does NOT seem to be patched.");
+                Logger.Info.WriteLines(
+                    "",
+                    "Unity does NOT seem to be patched.",
+                    "");
 
-                Console.WriteLine();
-
-                Console.Write("Do you want to patch? (Y/n) ");
+                Logger.Info.Write("Do you want to patch? (Y/n) ");
                 return YesNoChoice(true);
             }
         }
@@ -199,9 +205,11 @@ namespace UnityPatcher
             if (!File.Exists(backupPath))
             {
                 _stillSilent = false;
-                Console.WriteLine($"Missing backup file at path {backupPath}");
-                Console.WriteLine("Unpatching not possible");
-                Console.WriteLine("If you want to unpatch, please redownload Unity");
+                Logger.Error.WriteLines(
+                    "",
+                    $"Missing backup file at path {backupPath}",
+                    "Unpatching not possible",
+                    "If you want to unpatch, please redownload Unity");
                 return;
             }
 
@@ -210,29 +218,31 @@ namespace UnityPatcher
                 File.Delete(dllPath);
                 File.Move(backupPath, dllPath);
 
-                Console.WriteLine("Backup restored successfully. Unity is now unpatched.");
+                Logger.Success.WriteLines("Backup restored successfully. Unity is now unpatched.");
             }
             catch (Exception e)
             {
                 _stillSilent = false;
-                Console.WriteLine();
-                Console.WriteLine("Unpatch failed due to exception:");
-                Console.WriteLine(e.ToString());
-                Console.WriteLine();
-                Console.WriteLine("This might indicate missing permissions or a file lock.");
-                Console.WriteLine("If Unity is open, please close it and try again.");
-                Console.WriteLine("If Unity is installed in Program Files or another protected directory, you might need to run this program as administrator.");
-                Console.WriteLine();
-                Console.WriteLine("What do you want to do?");
-                Console.WriteLine("1. Retry");
-                Console.WriteLine("2. Retry as administrator");
-                Console.WriteLine("3. Perform unpatch manually");
-                Console.WriteLine("(Press any other key to exit)");
-                Console.WriteLine();
-                Console.Write("> ");
+
+                Logger.Error.WriteLines("",
+                    "Unpatch failed due to exception:",
+                    e.ToString());
+                Logger.Warning.WriteLines("",
+                    "This might indicate missing permissions or a file lock.",
+                    "If Unity is open, please close it and try again.",
+                    "If Unity is installed in Program Files or another protected directory, you might need to run this program as administrator.");
+                Logger.Info.WriteLines("",
+                    "What do you want to do?",
+                    "1. Retry",
+                    "2. Retry as administrator",
+                    "3. Perform unpatch manually",
+                    "(Press any other key to exit)",
+                    "");
+                Logger.Info.Write("> ");
+
                 ConsoleKeyInfo key = Console.ReadKey();
-                Console.WriteLine();
-                Console.WriteLine();
+                Logger.Info.WriteLines("", "");
+
                 if (key.Key == ConsoleKey.D1) DoUnpatch(dllPath, null);
                 else if (key.Key == ConsoleKey.D2) RelaunchAsAdmin($@"""{_editorPath}"" -u ""{_assetsPath}"" -e {(!_stillSilent ? " -ns" : "")}");
                 else if (key.Key == ConsoleKey.D3) DoManualUnpatch(dllPath);
@@ -241,46 +251,47 @@ namespace UnityPatcher
 
         private static void DoManualUnpatch(string dllPath)
         {
-            Console.WriteLine("The Unity.SourceGenerators folder has been opened in your file explorer application.");
-            Console.WriteLine("Please follow these steps for a manual unpatch:");
-            Console.WriteLine("1. Delete Unity.SourceGenerators.dll");
-            Console.WriteLine("2. Rename Unity.SourceGenerators.dll.bck to Unity.SourceGenerators.dll");
-            Console.WriteLine();
-            Console.WriteLine("After this is done, press any key to verify if the unpatch was successful.");
-            Console.WriteLine();
+            Logger.Message.WriteLines(
+                "The Unity.SourceGenerators folder has been opened in your file explorer application.",
+                "Please follow these steps for a manual unpatch:",
+                "1. Delete Unity.SourceGenerators.dll",
+                "2. Rename Unity.SourceGenerators.dll.bck to Unity.SourceGenerators.dll",
+                "",
+                "After this is done, press any key to verify if the unpatch was successful.",
+                "");
 
             Process.Start("explorer.exe", $"/select,\"{Path.GetFullPath(dllPath)}\"");
-            Console.ReadKey();
+            Console.ReadKey(true);
 
             if (!CheckDllPath(dllPath, false))
             {
-                Console.WriteLine();
-                Console.WriteLine("Keep in mind that if you're lost you can always redownload Unity to restore the original file");
-                Console.Write("Do you want to retry verification? (Y/n) ");
+                Logger.Info.WriteLines("",
+                    "Keep in mind that if you're lost you can always redownload Unity to restore the original file");
+                Logger.Info.Write("Do you want to retry verification? (Y/n) ");
                 if (YesNoChoice(true)) DoManualUnpatch(dllPath);
-                Console.WriteLine();
+                Logger.Info.WriteLines("");
                 return;
             }
 
             if (CheckPatch(dllPath, out AssemblyDefinition asm))
             {
                 asm.Dispose();
-                Console.WriteLine();
-                Console.WriteLine("Assembly seems to still be patched.");
-                Console.Write("Do you want to retry verification? (Y/n) ");
+                Logger.Warning.WriteLines("",
+                    "Assembly seems to still be patched.");
+                Logger.Info.Write("Do you want to retry verification? (Y/n) ");
                 if (YesNoChoice(true)) DoManualUnpatch(dllPath);
-                Console.WriteLine();
+                Logger.Info.WriteLines("");
                 return;
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Unpatch successful.");
-            Console.WriteLine();
+            Logger.Success.WriteLines("",
+                "Unpatch successful.",
+                "");
         }
 
         private static void DoPatch(string dllPath, AssemblyDefinition asm)
         {
-            Console.WriteLine("Patching...");
+            Logger.Debug.WriteLines("Patching...");
 
             TypeDefinition type = asm.MainModule.GetType("Unity.MonoScriptGenerator.TypeNameHelper");
             MethodDefinition method = type?.Methods.First(m => m.Name == "GetTypeInformation");
@@ -296,7 +307,7 @@ namespace UnityPatcher
                 return;
             }
 
-            Console.WriteLine($"Found method {method.FullName}");
+            Logger.Debug.WriteLines($"Found method {method.FullName}");
 
             const string typeToReplace = "Microsoft.CodeAnalysis.CSharp.Syntax.NamespaceDeclarationSyntax";
             int changes = 0;
@@ -306,13 +317,13 @@ namespace UnityPatcher
 
             TypeReference imported = asm.MainModule.ImportReference(typeRef);
 
-            Console.WriteLine($"Imported reference to {imported.FullName}");
+            Logger.Debug.WriteLines($"Imported reference to {imported.FullName}");
 
             foreach (VariableDefinition local in method.Body.Variables)
             {
                 if (local.VariableType.FullName == typeToReplace)
                 {
-                    Console.WriteLine($"Updating local variable {local.Index}");
+                    Logger.Debug.WriteLines($"Updating local variable {local.Index}");
                     local.VariableType = imported;
                     changes++;
                 }
@@ -322,13 +333,13 @@ namespace UnityPatcher
             {
                 if (instruction.Operand is TypeReference t && t.FullName == typeToReplace)
                 {
-                    Console.WriteLine($"Updating instruction {instruction} ...");
+                    Logger.Debug.WriteLines($"Updating instruction {instruction} ...");
                     instruction.Operand = imported;
                     changes++;
                 }
                 else if (instruction.Operand is MemberReference member && member.DeclaringType != null && member.DeclaringType.FullName == typeToReplace)
                 {
-                    Console.WriteLine($"Updating instruction {instruction} ...");
+                    Logger.Debug.WriteLines($"Updating instruction {instruction} ...");
                     member.DeclaringType = imported;
                     changes++;
                 }
@@ -336,25 +347,25 @@ namespace UnityPatcher
 
             if (asm.MainModule.GetType("CSharp11NamespacePatch") == null)
             {
-                Console.WriteLine("Creating signature type CSharp11NamespacePatch ...");
+                Logger.Debug.WriteLines("Creating signature type CSharp11NamespacePatch ...");
                 TypeDefinition patchType = new TypeDefinition("", "CSharp11NamespacePatch", TypeAttributes.Class | TypeAttributes.Public, asm.MainModule.TypeSystem.Object);
                 asm.MainModule.Types.Add(patchType);
                 changes++;
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Finished making changes");
+            Logger.Debug.WriteLines("",
+                "Finished making changes");
 
             if (changes <= 0)
             {
                 _stillSilent = false;
-                Console.WriteLine();
-                Console.WriteLine("No changes made. Assembly seems to be already patched somehow, even though previous patch checks failed.");
-                Console.WriteLine("This should never happen...");
+                Logger.Error.WriteLines("",
+                    "No changes made. Assembly seems to be already patched somehow, even though previous patch checks failed.",
+                    "This should never happen...");
                 return;
             }
 
-            Console.WriteLine("Saving assembly in temporary folder...");
+            Logger.Debug.WriteLines("Saving assembly in temporary folder...");
 
             string tempFolder = Path.GetTempFileName();
             File.Delete(tempFolder);
@@ -363,7 +374,7 @@ namespace UnityPatcher
             string tempDll = PathCombine(tempFolder, "Unity.SourceGenerators.dll");
             asm.Write(tempDll);
 
-            Console.WriteLine("Backing up original assembly...");
+            Logger.Debug.WriteLines("Backing up original assembly...");
 
             string tempBck = tempDll + ".bck";
             File.Copy(dllPath, tempBck);
@@ -375,36 +386,38 @@ namespace UnityPatcher
 
         private static void DoPatchSave(string tempDll, string tempBck, string targetDll, string targetBck)
         {
-            Console.WriteLine("Replacing original assembly...");
+            Logger.Debug.WriteLines("Replacing original assembly...");
 
             try
             {
                 File.Copy(tempBck, targetBck, true);
                 File.Copy(tempDll, targetDll, true);
 
-                Console.WriteLine("Patch successful. Please restart Unity!");
+                Logger.Success.WriteLines("Patch successful. Please restart Unity!");
             }
             catch (Exception e)
             {
                 _stillSilent = false;
-                Console.WriteLine();
-                Console.WriteLine("Patch failed due to exception:");
-                Console.WriteLine(e.ToString());
-                Console.WriteLine();
-                Console.WriteLine("This might indicate missing permissions or a file lock.");
-                Console.WriteLine("If Unity is open, please close it and try again.");
-                Console.WriteLine("If Unity is installed in Program Files or another protected directory, you might need to run this program as administrator.");
-                Console.WriteLine();
-                Console.WriteLine("What do you want to do?");
-                Console.WriteLine("1. Retry");
-                Console.WriteLine("2. Retry as administrator");
-                Console.WriteLine("3. Perform patch manually");
-                Console.WriteLine("(Press any other key to exit)");
-                Console.WriteLine();
-                Console.Write("> ");
+
+                Logger.Error.WriteLines("",
+                    "Patch failed due to exception:",
+                    e.ToString());
+                Logger.Warning.WriteLines("",
+                    "This might indicate missing permissions or a file lock.",
+                    "If Unity is open, please close it and try again.",
+                    "If Unity is installed in Program Files or another protected directory, you might need to run this program as administrator.");
+                Logger.Info.WriteLines("",
+                    "What do you want to do?",
+                    "1. Retry",
+                    "2. Retry as administrator",
+                    "3. Perform patch manually",
+                    "(Press any other key to exit)",
+                    "");
+                Logger.Info.Write("> ");
+
                 ConsoleKeyInfo key = Console.ReadKey();
-                Console.WriteLine();
-                Console.WriteLine();
+                Logger.Info.WriteLines("", "");
+
                 if (key.Key == ConsoleKey.D1) DoPatchSave(tempDll, tempBck, targetDll, targetBck);
                 else if (key.Key == ConsoleKey.D2) RelaunchAsAdmin($@"""{_editorPath}"" -p ""{_assetsPath}"" -e {(!_stillSilent ? " -ns" : "")}");
                 else if (key.Key == ConsoleKey.D3) DoManualPatchSave(tempDll, targetDll);
@@ -413,41 +426,42 @@ namespace UnityPatcher
 
         private static void DoManualPatchSave(string tempDll, string targetDll)
         {
-            Console.WriteLine("Two directories have been opened in your file explorer application.");
-            Console.WriteLine("Please move the Unity.SourceGenerators.dll and Unity.SourceGenerators.dll.bck file from the temporary directory to the Unity.SourceGenerators directory, overriding any existing files.");
-            Console.WriteLine("Important! If you don't move the .bck file as well, you will not be able to unpatch Unity after.");
-            Console.WriteLine();
-            Console.WriteLine("After this is done, press any key to verify if the patch was successful.");
-            Console.WriteLine();
+            Logger.Message.WriteLines(
+                "Two directories have been opened in your file explorer application.",
+                "Please move the Unity.SourceGenerators.dll and Unity.SourceGenerators.dll.bck file from the temporary directory to the Unity.SourceGenerators directory, overriding any existing files.",
+                "Important! If you don't move the .bck file as well, you will not be able to unpatch Unity after.",
+                "",
+                "After this is done, press any key to verify if the patch was successful.",
+                "");
 
             Process.Start("explorer.exe", $"/select,\"{Path.GetFullPath(tempDll)}\"");
             Process.Start("explorer.exe", $"/select,\"{Path.GetFullPath(targetDll)}\"");
-            Console.ReadKey();
+            Console.ReadKey(true);
 
             if (!CheckDllPath(targetDll, false))
             {
-                Console.WriteLine();
-                Console.WriteLine("Keep in mind that if you're lost you can always redownload Unity to restore the original file");
-                Console.Write("Do you want to retry verification? (Y/n) ");
+                Logger.Info.WriteLines("",
+                    "Keep in mind that if you're lost you can always redownload Unity to restore the original file");
+                Logger.Info.Write("Do you want to retry verification? (Y/n) ");
                 if (YesNoChoice(true)) DoManualPatchSave(tempDll, targetDll);
-                Console.WriteLine();
+                Logger.Info.WriteLines("");
                 return;
             }
 
             if (!CheckPatch(targetDll, out AssemblyDefinition asm))
             {
                 asm.Dispose();
-                Console.WriteLine();
-                Console.WriteLine("Assembly seems to NOT be patched.");
-                Console.Write("Do you want to retry verification? (Y/n) ");
+                Logger.Info.WriteLines("",
+                    "Assembly seems to NOT be patched.");
+                Logger.Info.Write("Do you want to retry verification? (Y/n) ");
                 if (YesNoChoice(true)) DoManualPatchSave(tempDll, targetDll);
-                Console.WriteLine();
+                Logger.Info.WriteLines("");
                 return;
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Patch successful.");
-            Console.WriteLine();
+            Logger.Success.WriteLines("",
+                "Patch successful.",
+                "");
         }
 
         private static bool YesNoChoice(bool def)
@@ -489,8 +503,9 @@ namespace UnityPatcher
 
             Process.Start(startInfo);
 
-            Console.WriteLine();
-            Console.WriteLine("Spawned separate process with administrator privileges");
+            Logger.Message.WriteLines("",
+                "Spawned separate process with administrator privileges");
+
             Environment.Exit(0);
         }
 
