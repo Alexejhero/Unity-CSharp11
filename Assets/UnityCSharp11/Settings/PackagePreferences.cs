@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using UnityCSharp11.Settings.Dialogs;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,10 +7,9 @@ using UnityEngine.UIElements;
 
 namespace UnityCSharp11.Settings
 {
-    public sealed class PackageSettingsProvider : SettingsProvider
+    public sealed class PackagePreferences : SettingsProvider
     {
         private readonly TemplateContainer _root;
-        internal static PackageSettingsProvider Instance;
 
         private static string PackagePath
         {
@@ -22,12 +20,11 @@ namespace UnityCSharp11.Settings
                 if (packagePath == "Packages/com.alexejhero.unitycsharp11")
                     packagePath = FileUtil.GetPhysicalPath("Assets/UnityCSharp11");
                 return packagePath;
-            } 
+            }
         }
 
-        private PackageSettingsProvider() : base("Preferences/C# 11", SettingsScope.User)
+        private PackagePreferences() : base("Preferences/C# 11", SettingsScope.User)
         {
-            Instance = this;
             string uxmlPath = AssetDatabase.GUIDToAssetPath("bee79e4550d59f44a980f4620ac749e1");
             VisualTreeAsset doc = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxmlPath);
             _root = doc.Instantiate();
@@ -38,34 +35,40 @@ namespace UnityCSharp11.Settings
             rootElement.Add(_root);
             _root.Q<Button>("patch").clicked += () => ConfirmAndPatch(true);
             _root.Q<Button>("unpatch").clicked += () => ConfirmAndPatch(false);
-            _root.Q<Toggle>("suppress-unpatched-dialog").value = !PatchDialog.ShowPatchDialog;
-            _root.Q<Toggle>("suppress-unpatched-dialog").RegisterCallback<ChangeEvent<bool>>(evt =>
-            {
-                PatchDialog.ShowPatchDialog = !evt.newValue;
-            });
+
+            Toggle disableDialogToggle = _root.Q<Toggle>("suppress-unpatched-dialog");
+            disableDialogToggle.value = !Config.ShowPatchDialog;
+            disableDialogToggle.RegisterValueChangedCallback(evt => Config.ShowPatchDialog = !evt.newValue);
+            Config.ShowPatchDialogChanged += ConfigOnShowPatchDialogChanged;
+
             UpdatePatched();
+        }
+
+        public override void OnDeactivate()
+        {
+            Config.ShowPatchDialogChanged -= ConfigOnShowPatchDialogChanged;
+        }
+
+        private void ConfigOnShowPatchDialogChanged(bool value)
+        {
+            _root.Q<Toggle>("suppress-unpatched-dialog").value = !value;
         }
 
         private void UpdatePatched()
         {
-            var isPatched = PatchChecker.IsPatched();
+            bool isPatched = PatchChecker.IsPatched();
             string status = isPatched ? "patched" : "unpatched";
             _root.ClearClassList();
-            _root.AddToClassList(status); 
-            
+            _root.AddToClassList(status);
+
             string statusText = $"Unity {Application.unityVersion} is currently {(isPatched ? "patched" : "not patched")}.";
             _root.Q(status).Q<Label>("status-label").text = statusText;
         }
 
-        public void OnShowPatchDialogUpdated()
-        {
-            _root.Q<Toggle>("suppress-unpatched-dialog").value = !PatchDialog.ShowPatchDialog;
-        }
-
         [SettingsProvider]
         public static SettingsProvider CreateMyCustomSettingsProvider()
-        { 
-            return new PackageSettingsProvider
+        {
+            return new PackagePreferences
             {
                 keywords = new[] {"c#", "11", "namespace", "patch", "csharp", "langversion"},
             };
@@ -87,14 +90,14 @@ namespace UnityCSharp11.Settings
             EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
             string exePath = Path.Combine(PackagePath, "UnityPatcher~", "UnityPatcher.exe");
-            
+
             Process.Start(new ProcessStartInfo
             {
                 FileName = exePath,
                 Arguments = $"\"{EditorApplication.applicationContentsPath}\" -{(patch ? 'p' : 'u')} \"{Application.dataPath}\"",
                 UseShellExecute = true,
             });
-            
+
             EditorApplication.Exit(0);
         }
     }

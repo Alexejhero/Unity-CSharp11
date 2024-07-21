@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/UnityCSharp11/Settings/PatchDialog/PatchDialog.uss?fileID=7433441132597879392&amp;guid=b8ad66b22b5329c4a947a7b00c5b2aee&amp;type=3#PatchDialog" />
+    <Style src="project://database/Assets/UnityCSharp11/Settings/Dialogs/PatchDialog.uss?fileID=7433441132597879392&amp;guid=b8ad66b22b5329c4a947a7b00c5b2aee&amp;type=3#PatchDialog" />
     <ui:VisualElement name="content" style="flex-grow: 1; margin-top: 1%; margin-right: 1%; margin-bottom: 1%; margin-left: 1%; flex-wrap: nowrap; align-items: auto; justify-content: center; align-self: auto; width: auto;">
         <ui:Label tabindex="-1" text="Unity does not natively support MonoBehaviours or ScriptableObjects in files with file-scoped namespaces, and will refuse to load them. In order to use this feature in Unity, an editor patch is required." parse-escape-sequences="true" display-tooltip-when-elided="true" />
         <ui:VisualElement style="flex-grow: 1; flex-direction: column; justify-content: center; align-self: stretch; align-items: center; flex-wrap: nowrap;">
-            <ui:Toggle text=" Don&apos;t show again" name="dont-show-again" style="align-self: center; margin-top: 3px;" />
+            <ui:Toggle text=" Don&apos;t show again for this project" name="dont-show-again" style="align-self: center; margin-top: 3px;" />
             <ui:VisualElement style="flex-direction: row; align-self: stretch; justify-content: center; align-items: center; flex-wrap: nowrap; flex-grow: 0; margin-top: 3px;">
                 <ui:Button text="Patch" name="patch" style="align-items: flex-start; align-self: center;" />
                 <ui:Button text="Ignore" name="ignore" />
