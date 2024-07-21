@@ -75,7 +75,6 @@ namespace UnityPatcher
             GetDllPath(args, out string dllPath);
             if (!CheckDllPath(dllPath, true)) return;
 
-            Logger.Debug.WriteLines("Checking patch status...");
             bool patched = CheckPatch(dllPath, out AssemblyDefinition asm);
 
             if (!TryGetIntention(args, patched, out bool intentionToPatch)) return;
@@ -192,6 +191,7 @@ namespace UnityPatcher
 
         private static bool CheckPatch(string dllPath, out AssemblyDefinition asm)
         {
+            Logger.Debug.WriteLines("Checking patch status...");
             asm = AssemblyDefinition.ReadAssembly(dllPath);
             return asm.MainModule.GetTypes().Any(t => t.Name == "CSharp11NamespacePatch");
         }
