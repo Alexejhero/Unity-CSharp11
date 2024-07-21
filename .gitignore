@@ -71,8 +71,8 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
-ConsoleApp/bin
-ConsoleApp/obj
+UnityPatcher/bin
+UnityPatcher/obj
 .idea
 Assembly-CSharp.csproj
 Assets/UnityPatcher~/UnityPatcher.exe.config
