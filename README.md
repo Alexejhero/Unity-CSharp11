@@ -1,7 +1,7 @@
 ## Unity C#11
 Unity package based on [Unity Roslyn Updater](https://github.com/DaZombieKiller/UnityRoslynUpdater) to enable using C#11 features (**including [file-scoped namespaces](#file-scoped-namespaces)**) in Unity 2022.
 
-Designed only to work on Windows.
+Designed only to work on Windows. It would be good to get this working on other platforms but since I only use Windows, that's what I've made this for. (PR welcome 🙂)
 
 #### Installation and Use
 Install from this git URL (see [How to install from a git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html)):
@@ -10,7 +10,8 @@ https://github.com/Alexejhero/Unity-CSharp11.git?path=Assets/UnityCSharp11
 ```
 After installing, [regenerate your C# project files](https://docs.unity3d.com/Manual/VisualStudioIntegration.html) - your project will now target C#11.
 
-Please refer to the [Language Support](https://github.com/DaZombieKiller/UnityRoslynUpdater?tab=readme-ov-file#c-11) section of Unity Roslyn Updater's README to see which features of C#11 will work. **C#12 features are not supported!**
+### Features
+Most C# 10 and C# 11 features will work. Please refer to the [Language Support](https://github.com/DaZombieKiller/UnityRoslynUpdater?tab=readme-ov-file#c-11) section of Unity Roslyn Updater's README to see which features are not available. Additionally, the Roslyn version that Unity uses **does not** support _file-local types_, so that will also be unavailable. **C#12 features are not supported!**
 
 #### File-scoped Namespaces
 By default, Unity 2022 fails to detect `MonoBehaviour` or `ScriptableObject` classes from files which use [file-scoped namespaces](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-10.0/file-scoped-namespaces).
