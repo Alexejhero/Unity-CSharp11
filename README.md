@@ -15,7 +15,7 @@ After installing, [regenerate your C# project files](https://docs.unity3d.com/Ma
 > [!Note]
 > If you are using Unity 6 or later (for which this package hasn't been updated yet), are using an operating system other than Windows, or don't want to patch your editor installation or make your coworkers do that, you can install from this url instead:
 > ```
-> https://github.com/Alexejhero/Unity-CSharp11.git?path=Assets/UnityCSharp11
+> https://github.com/Alexejhero/Unity-CSharp11.git?path=Assets/UnityCSharp11/NoPatching
 > ```
 
 ### Features
