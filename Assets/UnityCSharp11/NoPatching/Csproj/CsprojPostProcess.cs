@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnityCSharp11.Csproj
+namespace UnityCSharp11.NoPatching.Csproj
 {
     public sealed partial class CsprojPostProcess : AssetPostprocessor
     {

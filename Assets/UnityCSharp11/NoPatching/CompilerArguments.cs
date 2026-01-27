@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
 
-namespace UnityCSharp11
+namespace UnityCSharp11.NoPatching
 {
     public static class CompilerArguments
     {

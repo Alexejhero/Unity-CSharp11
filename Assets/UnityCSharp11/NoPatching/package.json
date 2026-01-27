@@ -1,0 +1,9 @@
+﻿{
+  "name": "com.alexejhero.unitycsharp11.nopatching",
+  "version": "1.1.2",
+  "displayName": "Unity C# 11 (no editor patching)",
+  "author": "Alexejhero",
+  "description": "Changes the C# language version to C# 11 in Unity.",
+  "unity": "2022.1",
+  "license": "MIT"
+}

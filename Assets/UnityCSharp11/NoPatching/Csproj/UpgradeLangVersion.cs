@@ -2,7 +2,7 @@ using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 
-namespace UnityCSharp11.Csproj
+namespace UnityCSharp11.NoPatching.Csproj
 {
     [UsedImplicitly]
     public sealed class UpgradeLangVersion : CsprojPostProcessStep

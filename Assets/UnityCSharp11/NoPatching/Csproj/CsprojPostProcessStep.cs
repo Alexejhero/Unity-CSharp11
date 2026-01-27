@@ -1,6 +1,6 @@
 using System.Xml.Linq;
 
-namespace UnityCSharp11.Csproj
+namespace UnityCSharp11.NoPatching.Csproj
 {
     public abstract class CsprojPostProcessStep
     {
