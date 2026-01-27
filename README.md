@@ -17,6 +17,7 @@ After installing, [regenerate your C# project files](https://docs.unity3d.com/Ma
 > ```
 > https://github.com/Alexejhero/Unity-CSharp11.git?path=Assets/UnityCSharp11/NoPatching
 > ```
+> Note that this will prevent file-scoped namespaces from working.
 
 ### Features
 Most C# 10 and C# 11 features will work. Please refer to the [Language Support](https://github.com/DaZombieKiller/UnityRoslynUpdater?tab=readme-ov-file#c-11) section of Unity Roslyn Updater's README to see which features are not available. Additionally, the Roslyn version that Unity uses **does not** support _file-local types_, so that will also be unavailable. **C#12 features are not supported!**
